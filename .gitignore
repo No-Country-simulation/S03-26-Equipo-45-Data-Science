@@ -1,0 +1,33 @@
+# Gitignore estándar para Python / Data Science
+# Basado en lo conversado: ignoramos secretos y metadata del agente
+
+# Agent & Gemini Metadata
+.agent/
+.gemini/
+
+# Secretos y Entornos
+.env
+.venv/
+env/
+venv/
+bin/
+lib/
+share/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Datos e Inteligencia (Ignorados para mantener el repo ligero)
+data/raw/
+data/processed/
+models/
+
+# OS
+.DS_Store
+Thumbs.db
