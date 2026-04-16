@@ -258,8 +258,9 @@ def main():
             
             c1, c2 = st.columns([2, 1])
             with c1:
+                model_algo_name = type(churn_model.named_steps['clf']).__name__ if churn_model else "Desconocido"
                 fig_dist = px.histogram(df_final, x="Churn_Probability", color="Risk_Segment", 
-                                       title="Distribución de Probabilidades (Modelo: Random Forest)",
+                                       title=f"Distribución de Probabilidades (Modelo: {model_algo_name})",
                                        color_discrete_map={'Bajo': '#22C55E', 'Medio': '#F59E0B', 'Alto': '#EF4444'})
                 st.plotly_chart(fig_dist, use_container_width=True)
             with c2:
@@ -267,7 +268,15 @@ def main():
                 ids_to_show = df_final['Internal_ID'].unique().tolist()
                 sel_user = st.selectbox("Seleccione ID Seudonimizado", ids_to_show)
                 user_data = df_final[df_final['Internal_ID'] == sel_user].iloc[0]
-                st.info(f"Riesgo: **{user_data['Risk_Segment']}** ({user_data['Churn_Probability']:.2f})")
+                
+                risk_level = user_data['Risk_Segment']
+                if risk_level == 'Alto':
+                    st.error(f"Riesgo: **{risk_level}** ({user_data['Churn_Probability']:.2f})")
+                elif risk_level == 'Medio':
+                    st.warning(f"Riesgo: **{risk_level}** ({user_data['Churn_Probability']:.2f})")
+                else:
+                    st.success(f"Riesgo: **{risk_level}** ({user_data['Churn_Probability']:.2f})")
+                    
                 st.write(f"Cluster de Comportamiento: **{user_data['cluster']}**")
                 
                 # Explicabilidad SHAP (XAI)
@@ -290,11 +299,18 @@ def main():
                         explainer = shap.TreeExplainer(rf_model)
                         shap_values = explainer.shap_values(X_user_transformed)
                         
-                        # Clase positiva (Churn = 1) es índice 1
+                        # Extraer valores base y shap dependiendo del tipo de modelo (XGBoost vs Sklearn RF)
+                        if isinstance(shap_values, list): # Caso Random Forest (Multi-clase / Lista de arrays)
+                            vals = shap_values[1][0]
+                            base_val = explainer.expected_value[1]
+                        else: # Caso XGBoost (Array directamente log-odds)
+                            vals = shap_values[0]
+                            base_val = explainer.expected_value[0] if isinstance(explainer.expected_value, (list, np.ndarray)) else explainer.expected_value
+                        
                         fig, ax = plt.subplots(figsize=(6, 4))
                         shap.waterfall_plot(shap.Explanation(
-                            values=shap_values[1][0], 
-                            base_values=explainer.expected_value[1], 
+                            values=vals, 
+                            base_values=base_val, 
                             data=X_user_transformed[0],
                             feature_names=list(feature_names)
                         ), show=False)
