@@ -1,11 +1,10 @@
 import pandas as pd
-import numpy as np
 
 def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Perform row-wise feature engineering and drop unnecessary columns.
-    No global state transformations (like imputation or scaling) are performed here
-    to prevent data leakage.
+    Ingeniería de características y limpieza de columnas para entrenamiento.
+    La seudonimización (PII) ocurre exclusivamente en make_dataset.py.
+    Esta función NO debe generar ni manipular Internal_ID.
     """
     df = df.copy()
     
@@ -13,20 +12,19 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     if 'total_orders' in df.columns:
         df['has_multiple_orders'] = (df['total_orders'] > 1).astype(int)
         
-    # 2. Convert date columns (optional if they are to be dropped anyway, but good for robustness)
+    # 2. Convertir columnas de fecha
     date_cols = ['first_purchase', 'last_purchase']
     for col in date_cols:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col], errors='coerce')
             
-    # 3. Drop ID and Leakage columns
-    # 'recency_days' and 'purchase_span_days' are identified as leakage in the notebook.
+    # 3. Eliminar identificadores y columnas no-predictoras
     cols_to_drop = [
-        'user_id', 
+        'Internal_ID',
+        'user_id',
         'first_purchase', 
-        'last_purchase',
-        'recency_days', 
-        'purchase_span_days'
+        'last_purchase'
+        # recency_days y purchase_span_days DEBEN ir al modelo, no se eliminan.
     ]
     
     df = df.drop(columns=[c for c in cols_to_drop if c in df.columns])
@@ -34,13 +32,19 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 if __name__ == "__main__":
-    # Quick sanity check
+    # Simulamos datos idénticos a los que entregaría make_dataset.py
     test_df = pd.DataFrame({
-        'user_id': [1, 2],
-        'total_orders': [1, 5],
-        'recency_days': [10, 2],
-        'age': [25, 30]
+        'Internal_ID': ['abc123', 'def456'],
+        'total_orders': [2, 3],
+        'recency_days': [4, 5],
+        'purchase_span_days': [6, 7],
+        'first_purchase': ['2023-01-01', '2023-01-15'],
+        'last_purchase': ['2023-01-01', '2023-03-01'],
+        'age': [7, 8]
     })
+    
     processed = preprocess_data(test_df)
-    print("Columns after preprocessing:", processed.columns.tolist())
-    print("has_multiple_orders values:", processed['has_multiple_orders'].tolist())
+    
+    print("✅ Columnas tras preprocesamiento:", processed.columns.tolist())
+    print("✅ has_multiple_orders:", processed['has_multiple_orders'].tolist())
+
