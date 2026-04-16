@@ -42,9 +42,9 @@ Para una comprensión profunda de las decisiones arquitectónicas, validaciones 
 ## 💻 Interfaz de la Plataforma
 | Prescripción de Acciones | Benchmark de Modelos y Explicabilidad (SHAP) |
 |:---:|:---:|
-| <img src="reports/figures/placeholder_dashboard.png" width="400" alt="Vista Ejecutiva"> | <img src="reports/figures/roc_comparison.png" width="400" alt="Benchmark de Precisión"> |
+| <img src="reports/figures/cluster_radar.png" width="400" alt="Vista Ejecutiva"> | <img src="reports/figures/roc_comparison.png" width="400" alt="Benchmark de Precisión"> |
 | **Generación de Embudos (2.4M Eventos)** | **Perfilado de Segmentos (K-Prototypes)** |
-| <img src="reports/figures/placeholder_funnel.png" width="400" alt="Cruce de Segmentos"> | <img src="reports/figures/placeholder_shaps.png" width="400" alt="Análisis SHAP"> |
+| <img src="reports/figures/funnel_conversion.png" width="400" alt="Cruce de Segmentos"> | <img src="reports/figures/shap_summary.png" width="400" alt="Análisis SHAP"> |
 
 ---
 
