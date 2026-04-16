@@ -25,20 +25,20 @@ def get_action_plan(df):
         # Cluster 3: Súper Comprador
         
         if risk == 'Alto':
-            if cluster == 3: return "📞 VIP Concierge Call", "Prioridad 5: Llamada personal inmediata.", 5
-            if cluster == 0: return "💬 WhatsApp Concierge", "Prioridad 4: Contacto directo para resolver dudas.", 4
-            if cluster == 2: return "🎁 Cupón Urgente 25%", "Prioridad 3: Incentivo fuerte para cerrar compra.", 3
-            return "📧 Encuesta de Salida", "Prioridad 2: Entender por qué se va el usuario.", 2
+            if cluster == 3: return "📞 VIP Concierge Call", "Llamada personal ejecutiva inmediata", "5 - Crítico (Llamada VIP)"
+            if cluster == 0: return "💬 WhatsApp Concierge", "Contacto directo resolutivo", "4 - Urgente (Atención Dedicada)"
+            if cluster == 2: return "🎁 Oferta Agresiva 30%", "Incentivo financiero fuerte", "3 - Acción Comercial Alta"
+            return "📧 Encuesta de Salida", "Análisis de Fuga", "2 - Encuesta/Feedback"
             
         elif risk == 'Medio':
-            if cluster == 3: return "💎 Acceso Anticipado", "Prioridad 3: Invitar a preventas exclusivas.", 3
-            if cluster == 0: return "🎁 Cupón 15%", "Prioridad 3: Empujón mediano de precio.", 3
-            if cluster == 2: return "🛒 Recordatorio Carrito", "Prioridad 2: Notificación de ítems olvidados.", 2
-            return "📧 Newsletter", "Prioridad 1: Mantener marca en el top of mind.", 1
+            if cluster == 3: return "💎 Acceso Anticipado", "Invitar a preventas exclusivas", "3 - Acción Comercial Alta"
+            if cluster == 0: return "🎁 Cupón 15%", "Empujón moderado de precio", "3 - Acción Comercial Alta"
+            if cluster == 2: return "🛒 Recordatorio Carrito", "Notificación Push de ítems", "2 - Recuperación Básica"
+            return "📧 Newsletter VIP", "Mantener marca en el top of mind", "1 - Nurturing pasivo"
             
         else: # Riesgo Bajo
-            if cluster == 3: return "👑 Programa de Puntos", "Prioridad 2: Incentivar lealtad a largo plazo.", 2
-            return "✅ Monitorización", "Prioridad 1: Cliente estable, seguir observando.", 1
+            if cluster == 3: return "👑 Programa de Lealtad", "Fidelización", "2 - Recuperación Básica"
+            return "✅ Monitorización", "Cliente estable", "1 - Nurturing pasivo"
 
     # Aplicar lógica
     actions = df.apply(define_action, axis=1)

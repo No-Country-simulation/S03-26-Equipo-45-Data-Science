@@ -33,9 +33,8 @@ Tras procesar 2.4M de eventos web y cruzarlos con la base de clientes, hemos ide
 
 ---
 
-## 🛠️ Próximos Pasos (Día 2 & 3)
-- [ ] **Motor Prescriptivo**: Asignar una "Acción de Marketing" automática basada en el Cluster + Riesgo de Churn.
-- [ ] **Análisis de Funnel**: Entender en qué punto exacto "El Explorador" abandona la página (Cart vs Product).
+## 🛠️ Próximos Pasos (Completados MLOps Fase 2)
+- [x] **Motor Prescriptivo**: Asignar una "Acción de Marketing" automática basada en el Cluster + Riesgo de Churn. (Implementado en `prescriptive_engine.py`)
+- [x] **Análisis de Funnel**: Entender en qué punto exacto "El Explorador" abandona la página (Cart vs Product). (Implementado en Pestaña 4 de Streamlit)
 
 ---
-*Generado automáticamente por Antigravity Agent - Hito 8*

@@ -21,12 +21,23 @@
 
 ---
 
-## 📙 Descripción
-**TheLook E-Commerce Intelligence** es una plataforma integral de retención de clientes diseñada para procesar la gigantesca huella digital de una empresa de retail digital. Actúa como el *Centro de Mando de Retención*, cruzando más de **2.4 Millones de eventos web** y 7 tablas relacionales para identificar de forma proactiva patrones de abandono (Churn).
+## 📙 Descripción Integral
 
-El sistema combina el poder del **Ecosistema Scikit-Learn/XGBoost** para realizar predicciones precisas de fuga con la estética analítica (*Glassmorphism*) de **Streamlit**, infiriendo ingresos en riesgo y accionando tácticas prescriptivas de forma automática.
+**Objetivo del Proyecto:** *"Desarrollar un modelo de análisis y predicción de churn (abandono de clientes) para empresas de e-commerce, que permita identificar patrones de comportamiento, detectar señales tempranas de fuga y generar insights accionables para mejorar la retención."*
 
-> 📊 **Objetivo de Negocio**: Identificar señales tempranas de fuga para salvar "Ingresos en Riesgo" ejecutando planes de marketing dirigidos.
+A continuación se demuestra arquitectónicamente **cómo** el equipo alcanzó este nivel de desarrollo industrial:
+
+### 🎯 Mapeo de Cumplimiento Quirúrgico (Arquitectura de Código)
+La justificación asertiva y el código crudo (.py) implementado por el equipo se encuentra dividido respetando los pilares de este objetivo matriz:
+
+1. [*"...un modelo de análisis y predicción de churn..."*] -> [Ver Documentación: Predicción y Scikit-Learn](docs/1_prediccion_churn.md)
+2. [*"...permitiendo identificar patrones de comportamiento..."*] -> [Ver Documentación: Polars y K-Prototypes](docs/2_patrones_comportamentales.md)
+3. [*"...detectar señales tempranas de fuga..."*] -> [Ver Documentación: Explicabilidad IA (SHAP) y Data Leakage](docs/3_senales_tempranas_xai.md)
+4. [*"...y generar insights accionables para mejorar la retención."*] -> [Ver Documentación: Arquitectura de Predicción (Hubspot/JSON)](docs/4_insights_accionables.md)
+5. **[Motor Prescriptivo de Negocios]** -> [Ver Documentación: Lógica Heurística y Reglas de Campaña](docs/6_motor_prescriptivo_negocio.md)
+6. **[RAG Rígidio: Hibridación IA]** -> [Ver Documentación: Traducción Ejecutiva con SHAP + Gemini Flash](docs/7_xai_llm_hybrid_pipeline.md)
+7. **[Sostenibilidad a Largo Plazo]** -> [Ver Documentación: Arquitectura MLOps Inmortal (Champion vs Challenger)](docs/5_arquitectura_mlops_evolutiva.md)
+8. **[Reingeniería de Negocio]** -> [Ver Documentación: Filtrado BOFU en el Funnel de Conversión](docs/8_embudo_bofu_conversion.md)
 
 ---
 
@@ -60,6 +71,18 @@ El desarrollo se estructuró dividiendo responsabilidades bajo el estándar de T
 - **Gestión CRM Dinámica (Motor Prescriptivo)**: Matriz que cruza el Nivel de Riesgo y el Arquetipo Conductual (`K-Clusters`) para sugerir canales de retención tangibles y exportables en un JSON directo para Hubspot o Mail Marketing.
 - **Extracción Analítica de SCM**: Mapeos estadísticos sobre devoluciones logísticas que demostraron cómo el producto físico y la experiencia física penalizan el Customer Lifetime Value.
 - **Explicabilidad (XAI)**: Mapeo de contribuciones con `SHAP TreeExplainer` para asegurar un modelo *honesto* ("caja de cristal").
+
+---
+
+### 🎯 Prescripción de Acciones y Exportabilidad Ejecutiva (CRM)
+El tercer pilar estructural de la plataforma transforma los cálculos probabilísticos en ingresos monetarios defendidos. La pestaña del Plan de Acción consolida la inteligencia matemática devolviendo instrucciones tácticas:
+
+- **Motor Heurístico de Negocio:** Combina probabilística pura (XGBoost) con modelos conductuales (K-Prototypes) para generar una salida que los equipos de Ventas, Marketing y Fidelización entienden perfectamente. El sistema prioriza automáticamente a los usuarios más críticos.
+- **Riesgo Financiero Expuesto (`Expected_Revenue_Loss`):** La plataforma calcula de forma instantánea cuánto dinero exacto está en la mesa al multiplicar el LTV/Ingreso Histórico por el Riesgo de Churn, y ordena sistemáticamente la tabla desde la peor fuga económica hasta la de menor impacto monetario.
+- **Canalización B2B Exportable:** La UI cuenta con botones de inyección de exportación nativa para la integración en arquitecturas empresariales:
+  - `Plan CRM (JSON)`: Preparado para integrarse nativamente a software B2B como HubSpot.
+  - `Base Auditada (CSV)`: Exportación higienizada sin PII, conteniendo la metadata procesada.
+  - `Informe Ejecutivo (MD)`: Lecturas tácticas amigables para los Jefes de Operaciones.
 
 ---
 
@@ -145,6 +168,40 @@ proyecto-ecommerce-churn/
 
 ---
 
+## 🚦 Pipeline de Ejecución MLOps (Instrucciones)
+
+Para reproducir el entorno desde cero y asegurar que el modelo se alimente con los datos más frescos, el sistema debe ejecutarse en el siguiente orden estricto (Pipeline ETL y Entrenamiento):
+
+### 1. Ingesta y Limpieza de Datos (Data Engineering)
+Extrae los datos desde Kaggle Hub, los anonimiza utilizando Microsoft Presidio y consolida los features por usuario.
+```bash
+# 1. (Opcional si no tienes la data cruda) Descargar datasets de TheLook
+python src/data/download_datasets.py
+
+# 2. Compilar features, anonimizar PII y crear la base maestra para entrenamiento
+python src/data/make_dataset.py
+```
+> **Salida Esperada:** `data/processed/user_features_churn.csv`
+
+### 2. Entrenamiento de Modelos (Data Science)
+Entrena la arquitectura predictiva y el motor de segmentación geométrica.
+```bash
+# 1. Entrenar XGBoost, evaluar métricas, generar matrices ROC y exportar .joblib
+python src/models/train_model.py
+
+# 2. Optimizar K-Prototypes, definir Arquetipos Conductuales y exportar .joblib
+python src/models/train_clustering.py
+```
+> **Salida Esperada:** Modelos `.joblib` en la carpeta `/models/` y diagnósticos en `/reports/`.
+
+### 3. Despliegue del Centro de Mando (Dashboard)
+Levanta la interfaz operativa para analizar cohortes en tiempo real.
+```bash
+streamlit run src/app/main.py
+```
+> **Nota:** Para que la inferencia contextual LLM funcione (Traducción SHAP), asegúrate de tener tu archivo `.env` configurado con tu variable `GEMINI_API_KEY`.
+
+---
 ## 🛡️ Privacidad Zero Trust (Shift-Left)
 El Dashboard prohíbe la subida de datos que contengan PII (Nombres, Emails, IPs). TheLook E-Commerce Analytics implementa **Doctrina Shift-Left Privacy**: el grueso sintáctico lo detecta `PIIAnonymizer` procesando miles de atributos natural language en el originador ETL, liberando el Dashboard de colapsos cognitivos. Cualquier salto de regla provocará que el centinela en Streamlit lance el protocolo **Fail-Fast** denegando la inferencia.
 

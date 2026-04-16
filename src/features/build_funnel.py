@@ -14,25 +14,26 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 RAW_EVENTS_PATH = os.path.join(BASE_DIR, 'data', 'raw', 'events.csv')
 RAW_USERS_PATH = os.path.join(BASE_DIR, 'data', 'raw', 'users.csv')
 
-# Etapas del funnel en orden de profundidad
-FUNNEL_STAGES = ['home', 'department', 'product', 'cart', 'purchase']
+# Etapas críticas del embudo de conversión (Bottom of Funnel)
+# Excluimos Home/Department porque el tráfico entra directo a Product (tráfico no lineal)
+FUNNEL_STAGES = ['product', 'cart', 'purchase']
 
 
-# Calcula el funnel global con usuarios únicos en cada etapa
+# Calcula el funnel global con sesiones únicas en cada etapa (Drop-offs reales)
 def build_global_funnel(events_path=RAW_EVENTS_PATH):
-    print("🔄 Cargando eventos para funnel...")
+    print("🔄 Cargando eventos para funnel (Basado en Sesiones)...")
     df = pd.read_csv(
         events_path,
-        usecols=['user_id', 'event_type'],
-        dtype={'user_id': 'str', 'event_type': 'str'}
+        usecols=['session_id', 'event_type'],
+        dtype={'session_id': 'str', 'event_type': 'str'}
     )
 
-    # Filtrar eventos sin user_id
-    df = df.dropna(subset=['user_id'])
+    # El embudo real de e-commerce se mide por sesiones, no por vida útil del usuario.
+    df = df.dropna(subset=['session_id'])
 
     funnel_data = []
     for stage in FUNNEL_STAGES:
-        unique_users = df[df['event_type'] == stage]['user_id'].nunique()
+        unique_users = df[df['event_type'] == stage]['session_id'].nunique()
         funnel_data.append({
             'stage': stage.capitalize(),
             'unique_users': unique_users

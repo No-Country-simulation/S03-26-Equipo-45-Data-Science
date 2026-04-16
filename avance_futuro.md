@@ -23,6 +23,12 @@
 | `events.csv` | **2.4M+** (393 MB) | ✅ Procesado (Funnel + Event Features) |
 | `users.csv` | ~100K | ✅ Procesado (Customer Demographics) |
 | `order_items.csv` | ~137K | ✅ Procesado (RFM & Logistic Friction) |
+
+### 🛑 Limitantes Arquitectónicas V1.0 (Transparencia MLOps)
+El proyecto en su versión 1.0 es una demostración "Estática" de Inferencia. La fase evolutiva real de MLOps en Producción se encuentra intencionalmente fuera de alcance por restricciones de infraestructura:
+- **Ausencia de CI/CD para Modelos:** No se cuenta con flujos automatizados (VertexAI, Airflow o GitHub Actions) que recopilen feedback continuo de producción.
+- **Monitoreo de Data Drift:** No hay un orquestador que verifique la erosión o degradación de los datos (Concept Drift) para dictaminar un re-entrenamiento "mágico". 
+- **Entrenamiento Batch/Offline:** Todo entrenamiento se ejecuta manualmente de forma local (`src/models/train_model.py`); el Dashboard funciona únicamente como *Centro de Mando (Inference Wrapper)* consumiendo este resultado.
 | `orders.csv` | ~80K | ✅ Procesado (Frequency Metrics) |
 | `products.csv` | ~30K | ✅ Procesado (Product Intelligence) |
 | `inventory_items.csv` | ~500K | ✅ Procesado (Supply Chain Analysis) |
