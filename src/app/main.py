@@ -155,8 +155,9 @@ def apply_inference(df_input, churn_model, cluster_artifact):
     else:
         df_input['cluster'] = 0
 
-    # 4. Motor Prescriptivo (Revenue Ponderado)
-    df_input = get_action_plan(df_input)
+    # 4. Motor Prescriptivo Dinámico
+    cluster_mapping = cluster_artifact.get('cluster_mapping') if cluster_artifact else None
+    df_input = get_action_plan(df_input, cluster_mapping)
     
     return df_input, df_processed
 
@@ -233,7 +234,9 @@ def main():
         # Escaneamos solo si no hemos anonimizado ya en esta sesión
         if 'pii_cleared' not in st.session_state or st.session_state.pii_cleared != file_identifier:
             with st.spinner('Escaneando privacidad con IA (Presidio)...'):
-                pii_report = anonymizer.scan_dataframe(df_raw)
+                safe_features = ['first_purchase', 'last_purchase', 'country', 'signup_source', 
+                                 'avg_session_duration_sec', 'dominant_traffic_source', 'Internal_ID']
+                pii_report = anonymizer.scan_dataframe(df_raw, ignore_cols=safe_features)
             
             if pii_report:
                 st.error("🛑 **ACCESO DENEGADO: VIOLACIÓN DE PRIVACIDAD**")
@@ -464,46 +467,53 @@ def main():
                 f_prior = st.multiselect("Filtrar por Nivel de Intervención", priorities_avail, default=default_priors)
             
             with c_f2:
-                clusters_avail = list(df_final['cluster'].dropna().unique())
-                f_cluster = st.multiselect("Filtrar por Arquetipo (Cluster)", clusters_avail, default=clusters_avail)
+                # Usar nombres de arquetipos dinámicos para el filtro
+                archetypes_avail = list(df_final['Archetype'].dropna().unique())
+                f_archetype = st.multiselect("Filtrar por Arquetipo Conductual", archetypes_avail, default=archetypes_avail)
                 
-            # Creación dinámica de la tabla renderizada
-            df_actions = df_final[(df_final['Priority'].isin(f_prior)) & (df_final['cluster'].isin(f_cluster))].copy()
+            # Aplicar filtros cruzados
+            df_actions = df_final[(df_final['Priority'].isin(f_prior)) & (df_final['Archetype'].isin(f_archetype))].copy()
             
-            # --- SECCIÓN DEL ATLAS GLOBAL DE REGLAS ---
-            with st.expander("📖 Atlas de Reglas del Motor Prescriptivo (Todas las Posibilidades)"):
-                st.markdown("Esta tabla interactiva expone **el universo total de decisiones** que la IA puede tomar. Puedes buscar o filtrar dinámicamente cualquier combinación estructural:")
+            # --- SECCIÓN DEL ATLAS GLOBAL DE REGLAS (DINÁMICO) ---
+            with st.expander("📖 Atlas de Reglas y Umbrales (Cómo decide la IA)"):
+                st.markdown("Esta tabla expone el **universo total de decisiones** y los umbrales promedios que el modelo actual utiliza para clasificar a los clientes:")
                 
-                # Generar el universo de cruces cartesianos mockeado
-                arr_rules = []
-                map_c = {0: 'VIP Indeciso (C0)', 1: 'Transeúnte (C1)', 2: 'Explorador (C2)', 3: 'Súper Comprador (C3)'}
-                for risk_lvl in ['Alto', 'Medio', 'Bajo']:
-                    for clus_id in [0, 1, 2, 3]:
-                        arr_rules.append({'Risk_Segment': risk_lvl, 'cluster': clus_id, 'Arquetipo': map_c[clus_id]})
-                
-                df_universe = pd.DataFrame(arr_rules)
-                df_universe['total_revenue'] = 0  # mock required feature
-                df_universe['Churn_Probability'] = 0 # mock required feature
-                df_universe = get_action_plan(df_universe)
-                
-                # Ordenar por el rigor del motor
-                df_universe = df_universe.sort_values(by=['Priority', 'Risk_Segment'], ascending=[False, False])
-                
-                st.dataframe(
-                    df_universe[['Risk_Segment', 'Arquetipo', 'Priority', 'Action', 'Action_Description']],
-                    column_config={
-                        "Risk_Segment": "Riesgo de Fuga",
-                        "Arquetipo": "Arquetipo Conductual",
-                        "Priority": "Prioridad",
-                        "Action": "Táctica",
-                        "Action_Description": "Justificación Prescriptiva"
-                    },
-                    hide_index=True,
-                    use_container_width=True
-                )
+                if cluster_artifact and 'cluster_mapping' in cluster_artifact:
+                    mapping = cluster_artifact['cluster_mapping']
+                    profiles = cluster_artifact.get('archetype_profiles', {})
+                    
+                    arr_rules = []
+                    for risk_lvl in ['Alto', 'Medio', 'Bajo']:
+                        for clus_id, arch_name in mapping.items():
+                            prof = profiles.get(arch_name, {})
+                            arr_rules.append({
+                                'Risk_Segment': risk_lvl, 
+                                'cluster': clus_id, 
+                                'Arquetipo': arch_name,
+                                'Gasto Promedio': prof.get('avg_revenue', 0),
+                                'Frecuencia (Sessions)': prof.get('avg_sessions', 0)
+                            })
+                    
+                    df_universe = pd.DataFrame(arr_rules)
+                    df_universe['total_revenue'] = 0
+                    df_universe['Churn_Probability'] = 0
+                    df_universe = get_action_plan(df_universe, mapping)
+                    df_universe = df_universe.sort_values(by=['Priority', 'Risk_Segment'], ascending=[False, False])
+                    
+                    st.dataframe(
+                        df_universe[['Risk_Segment', 'Arquetipo', 'Gasto Promedio', 'Frecuencia (Sessions)', 'Priority', 'Action']],
+                        column_config={
+                            "Gasto Promedio": st.column_config.NumberColumn(format="$%.2f"),
+                            "Frecuencia (Sessions)": st.column_config.NumberColumn(format="%.1f")
+                        },
+                        hide_index=True,
+                        use_container_width=True
+                    )
+                else:
+                    st.warning("Cluster mapping no disponible en el artefacto actual.")
             
             # --- RENDER PRINCIPAL DE DATOS ---
-            cols_show = ['Internal_ID', 'Risk_Segment', 'cluster', 'total_revenue', 'Expected_Revenue_Loss', 'Action', 'Action_Description', 'Priority']
+            cols_show = ['Internal_ID', 'Risk_Segment', 'Archetype', 'total_revenue', 'Expected_Revenue_Loss', 'Action', 'Action_Description', 'Priority']
             
             # Formatear la tabla nativamente mediante st.column_config para evitar el límite de Pandas Styler
             st.dataframe(
