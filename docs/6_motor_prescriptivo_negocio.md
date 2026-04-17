@@ -14,12 +14,13 @@ La lógica está aislada en la sintaxis de Python para lograr asignación O(1) u
 ```python
     def define_action(row):
         risk = row['Risk_Segment']
-        cluster = row['cluster']
+        # Mapeo Dinámico de ID de Clúster a Nombre de Arquetipo
+        archetype = row['Archetype'] 
         
         if risk == 'Alto':
-            if cluster == 3: return "📞 VIP Concierge Call", "Llamada personal ejecutiva inmediata", "5 - Crítico (Llamada VIP)"
-            if cluster == 0: return "💬 WhatsApp Concierge", "Contacto directo resolutivo", "4 - Urgente (Atención Dedicada)"
-            if cluster == 2: return "🎁 Oferta Agresiva 30%", "Incentivo financiero fuerte", "3 - Acción Comercial Alta"
+            if archetype == "Súper Comprador": return "📞 VIP Concierge Call", "Llamada personal ejecutiva inmediata", "5 - Crítico (Llamada VIP)"
+            if archetype == "VIP Indeciso": return "💬 WhatsApp Concierge", "Contacto directo resolutivo", "4 - Urgente (Atención Dedicada)"
+            if archetype == "Explorador": return "🎁 Oferta Agresiva 30%", "Incentivo financiero fuerte", "3 - Acción Comercial Alta"
             return "📧 Encuesta de Salida", "Análisis de Fuga", "2 - Encuesta/Feedback"
             
         elif risk == 'Medio':
@@ -29,13 +30,13 @@ La lógica está aislada en la sintaxis de Python para lograr asignación O(1) u
 ## Fundamentos Estructurales de las Reglas
 
 1. **Evitar la Dilución del Margen (No regalar dinero):**
-    A un `"Súper Comprador" (Cluster 3)` que está en Riesgo Alto, el sistema **nunca** le prescribe un "Cupón del 30%". Esto destruiría el *Net Profit* de la empresa, porque el LTV (Lifetime Value) de este usuario es altísimo y su problema rara vez es el poder adquisitivo. La prescripción exige trato cualitativo: una llamada personal inmediata (`Prioridad 5 - Crítico`).
+    A un `"Súper Comprador"` que está en Riesgo Alto, el sistema **nunca** le prescribe un "Cupón del 30%". Esto destruiría el *Net Profit* de la empresa, porque el LTV (Lifetime Value) de este usuario es altísimo y su problema rara vez es el poder adquisitivo. La prescripción exige trato cualitativo: una llamada personal inmediata (`Prioridad 5 - Crítico`).
 
 2. **Supresión de Fricción Financiera (Catalizadores):**
-    En contraparte, el `"Explorador" (Cluster 2)`—un usuario que hace *window shopping* visitando decenas de páginas pero que rara vez pasa por caja—sufre fricción en el momento de la verdad (*Checkout*). A este perfil, en Riesgo Alto, el motor automatiza el disparo agresivo: *"Oferta Agresiva 30%"*.
+    En contraparte, el `"Explorador"`—un usuario que hace *window shopping* visitando decenas de páginas pero que rara vez pasa por caja—sufre fricción en el momento de la verdad (*Checkout*). A este perfil, en Riesgo Alto, el motor automatiza el disparo agresivo: *"Oferta Agresiva 30%"*.
 
-3. **Abandono Estratégico (Perder Para Ganar):**
-    El caso crítico es el `"Transeúnte" (Cluster 1)`, un usuario sin lealtad y de bajo gasto histórico (promediando $66 dólares). Si el sistema intentara rescatarlo enviando agentes telefónicos a llamarlo uno por uno, el coste logístico de la campaña superaría las ganancias del rescate (ROI Negativo). El motor desploma su importancia a `"Prioridad 2"` automatizando una triste y barata "Encuesta de Salida", aceptando que es rentable dejarlo ir.
+3. **Transparencia Ejecutiva (El Atlas de Reglas):**
+    Para garantizar que los gerentes entiendan el "por qué" de cada decisión, el Dashboard expone un **Atlas de Reglas Dinámico**. Esta tabla permite ver el cruce exacto de los 12 escenarios posibles (3 niveles de Riesgo x 4 Arquetipos) y las métricas de gasto/frecuencia que activaron dichas etiquetas en el modelo actual.
 
 ## Exposición del Riesgo Financiero
 Para culminar el diseño orientado a negocio de este archivo, se calcula matemáticamente la pérdida proyectada en el cruce de eventos:

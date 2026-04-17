@@ -74,15 +74,13 @@ El desarrollo se estructuró dividiendo responsabilidades bajo el estándar de T
 
 ---
 
-### 🎯 Prescripción de Acciones y Exportabilidad Ejecutiva (CRM)
-El tercer pilar estructural de la plataforma transforma los cálculos probabilísticos en ingresos monetarios defendidos. La pestaña del Plan de Acción consolida la inteligencia matemática devolviendo instrucciones tácticas:
+### 🎯 Motor Prescriptivo Dinámico y Atlas de Reglas (CRM)
+El tercer pilar estructural de la plataforma transforma los cálculos probabilísticos en ingresos monetarios defendidos. El sistema ahora opera bajo una arquitectura **totalmente dinámica**:
 
-- **Motor Heurístico de Negocio:** Combina probabilística pura (XGBoost) con modelos conductuales (K-Prototypes) para generar una salida que los equipos de Ventas, Marketing y Fidelización entienden perfectamente. El sistema prioriza automáticamente a los usuarios más críticos.
-- **Riesgo Financiero Expuesto (`Expected_Revenue_Loss`):** La plataforma calcula de forma instantánea cuánto dinero exacto está en la mesa al multiplicar el LTV/Ingreso Histórico por el Riesgo de Churn, y ordena sistemáticamente la tabla desde la peor fuga económica hasta la de menor impacto monetario.
-- **Canalización B2B Exportable:** La UI cuenta con botones de inyección de exportación nativa para la integración en arquitecturas empresariales:
-  - `Plan CRM (JSON)`: Preparado para integrarse nativamente a software B2B como HubSpot.
-  - `Base Auditada (CSV)`: Exportación higienizada sin PII, conteniendo la metadata procesada.
-  - `Informe Ejecutivo (MD)`: Lecturas tácticas amigables para los Jefes de Operaciones.
+- **Auto-Etiquetado de Arquetipos:** El motor de clustering (`K-Prototypes`) utiliza un sistema de ranking post-entrenamiento para asignar nombres de negocio (`Súper Comprador`, `VIP Indeciso`, etc.) basados en el valor real de los datos, eliminando la inestabilidad de los IDs aleatorios.
+- **Atlas de Reglas Interactivo:** Una nueva funcionalidad ejecutiva que expone con total transparencia los umbrales de gasto y frecuencia que la IA utiliza para categorizar a cada segmento, permitiendo auditar la lógica de la "caja negra".
+- **Riesgo Financiero Expuesto (`Expected_Revenue_Loss`):** La plataforma calcula de forma instantánea cuánto dinero exacto está en la mesa al multiplicar el LTV/Ingreso Histórico por el Riesgo de Churn, permitiendo jerarquizar las campañas de retención por impacto económico.
+- **Canalización B2B Exportable:** La UI cuenta con botones de inyección de exportación nativa para la integración en arquitecturas empresariales (HubSpot JSON, CSV Auditado e Informes Ejecutivos).
 
 ---
 

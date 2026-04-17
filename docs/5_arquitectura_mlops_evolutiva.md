@@ -42,4 +42,15 @@ Para asegurar de que la web Streamlit nunca se caiga (*crash*) a pesar de que "l
    vals = np.asarray(vals).flatten()
    ```
 
+## Auto-Etiquetado Dinámico de Arquetipos (El Fin del "Cluster Drift")
+Una vulnerabilidad común en sistemas de clustering es que el algoritmo (K-Prototypes) asigna IDs numéricos aleatorios (0, 1, 2, 3) en cada entrenamiento. Si el clúster 3 era "VIP" hoy, mañana podría ser el "Transeúnte".
+
+Nuestra arquitectura industrial resuelve esto mediante un **Ranking Post-Entrenamiento** en `train_clustering.py`:
+1. El sistema entrena el modelo de forma agnóstica.
+2. Interroga los centroides resultantes y rankea los clústeres por `Total_Revenue` y `Frequency`.
+3. Asocia dinámicamente el nombre del negocio (ej: "Súper Comprador") al ID numérico ganador.
+4. El empaquetado `.joblib` incluye este mapa de etiquetas, permitiendo que el **Motor Prescriptivo** tome decisiones basadas en nombres humanos, eliminando riesgos operativos de mala asignación de prioridades.
+
+---
+
 **Conclusión:** TheLook Dashboard es una arquitectura evolutiva. Es decir, a medida que TheLook encuentre algoritmos que predigan mejor la fuga, la transición requerirá **cero líneas de código** de mantenimiento en el Front-End.

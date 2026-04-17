@@ -26,7 +26,6 @@ __pycache__/
 # Datos e Inteligencia (Ignorados para mantener el repo ligero)
 data/raw/
 data/processed/
-models/
 
 # OS
 .DS_Store
