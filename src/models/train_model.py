@@ -1,3 +1,8 @@
+"""
+Pipeline de Entrenamiento y Benchmarking de Modelos de Churn.
+Implementa una arquitectura 'Champion vs Challenger' comparando LogReg, RandomForest y XGBoost.
+Optimizado para maximizar el RECALL para reducir el costo de oportunidad de pérdida de usuarios (CAC > Retención).
+"""
 import pandas as pd
 import numpy as np
 import joblib

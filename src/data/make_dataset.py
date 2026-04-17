@@ -1,3 +1,8 @@
+"""
+Pipeline de Ingeniería de Datos (ETL) y Privacidad para TheLook.
+Flujo: Raw Data -> Cleaning -> Dynamic Cutoff (Anti-Leakage) -> Feature Engineering -> Anonymization.
+Malla de seguridad: Microsoft Presidio (Scan-Mode).
+"""
 import pandas as pd
 import numpy as np
 import os
@@ -5,8 +10,9 @@ from src.features.anonymizer import PIIAnonymizer
 
 def make_dataset(raw_dir, processed_dir):
     """
-    Transforma los datos crudos de Kaggle en el dataset final de Churn.
-    Replica la lógica del EDA Notebook de forma modular.
+    Transforma los datos crudos en el dataset maestro de Churn.
+    Implementa el filtrado temporal estricto (Shift-Left) para prevenir Data Leakage
+    basado en una ventana de inactividad de 120 días (Standard CLV Window).
     """
     print("🧪 Iniciando procesamiento de datos...")
     

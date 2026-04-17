@@ -243,4 +243,17 @@ cp .env.example .env
    ```
 
 ---
+
+## 🏛️ Gobernanza y Mantenimiento de Datos
+
+Para asegurar la integridad técnica y comercial del proyecto, hemos establecido una arquitectura de gobernanza basada en transparencia y prevención de riesgos:
+
+- [**🛡️ Prevención de Data Leakage**](docs/9_preparacion_datos_leakage.md): Detalle técnico de cómo usamos la técnica *Shift-Left* y el *Cutoff Date* para evitar falsas precisiones.
+- [**🧠 Estrategia de Entrenamiento (CAC & CLV)**](docs/10_entrenamiento_y_frecuencia.md): Justificación de KPIs de negocio para la sensibilidad del modelo y protocolo de re-entrenamiento bimestral.
+- [**🔒 Auditoría de Privacidad**](docs/7_xai_llm_hybrid_pipeline.md): Uso de Microsoft Presidio para garantizar un sistema *Zero-Trust*.
+
+> [!NOTE]
+> El sistema está diseñado para ser autogestionado. El equipo de Operaciones puede disparar re-entrenamientos mediante comandos CLI sin necesidad de reescribir la lógica del Dashboard.
+
+---
 © 2026 TheLook Analytics Team | No Country Simulation
