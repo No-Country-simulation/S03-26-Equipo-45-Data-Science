@@ -1,3 +1,8 @@
+"""
+Motor de Análisis de Producto y Suministro (SCM).
+Calcula ratios de devolución por marca y categoría para identificar 
+puntos de fricción logística que inducen al churn.
+"""
 import os
 import pandas as pd
 import numpy as np

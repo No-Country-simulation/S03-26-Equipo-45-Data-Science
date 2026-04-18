@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import os
 from src.features.anonymizer import PIIAnonymizer
+from datetime import datetime
 
 def make_dataset(raw_dir, processed_dir):
     """
@@ -175,9 +176,10 @@ def make_dataset(raw_dir, processed_dir):
     else:
         print("✅ No se detectó PII adicional en las columnas seleccionadas.")
 
-    # Guardar resultado principal
+    # Guardar resultado principal con timestamp
     os.makedirs(processed_dir, exist_ok=True)
-    output_path = os.path.join(processed_dir, "user_features_churn.csv")
+    timestamp = datetime.now().strftime("%Y%m%d")
+    output_path = os.path.join(processed_dir, f"user_features_churn_{timestamp}.csv")
     user_features.to_csv(output_path, index=False)
     print(f"✅ Dataset seudonimizado guardado en: {output_path}")
 

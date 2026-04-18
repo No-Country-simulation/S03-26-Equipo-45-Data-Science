@@ -1,5 +1,9 @@
 import os
 import sys
+"""
+Motor de Generación de Reportes y Visualizaciones Estáticas.
+Centraliza la creación de figuras PNG y reportes Markdown para auditoría y consumo ejecutivo.
+"""
 import pandas as pd
 import numpy as np
 import matplotlib

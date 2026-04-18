@@ -1,3 +1,12 @@
+"""
+TheLook CRM Dashboard - Centro de Mando de Retención.
+Interfaz Streamlit que integra:
+1. Inferencia de Churn (XGBoost)
+2. Segmentación de Arquetipos (K-Prototypes)
+3. Motor Prescriptivo de Acciones
+4. Análisis de Funnel y Comportamiento Web
+5. Gobernanza 'Zero Trust' con MS Presidio.
+"""
 import streamlit as st
 import pandas as pd
 import joblib
@@ -19,6 +28,9 @@ from src.features.build_features import preprocess_data
 from src.features.prescriptive_engine import get_action_plan
 from src.features.build_funnel import build_global_funnel, build_segmented_funnel
 from src.features.anonymizer import PIIAnonymizer
+from src.app.ecommerce import render_ecommerce
+from src.app.ingestion_hub import render_ingestion_hub
+import glob
 
 # Configuración de página
 st.set_page_config(
@@ -96,14 +108,30 @@ st.markdown("""
 # --- CARGA DE MODELOS ---
 @st.cache_resource
 def load_models():
-    """Carga los modelos de Churn y Clustering."""
-    churn_path = "models/churn_pipeline_v1.joblib"
-    cluster_path = "models/kprototypes_segments.joblib"
-    
-    churn_model = joblib.load(churn_path) if os.path.exists(churn_path) else None
-    cluster_artifact = joblib.load(cluster_path) if os.path.exists(cluster_path) else None
-    
-    return churn_model, cluster_artifact
+    """Carga los modelos pre-entrenados del disco."""
+    try:
+        model = joblib.load("models/churn_pipeline_v1.joblib")
+        cluster_path = "models/kprototypes_segments.joblib"
+        cluster_artifact = joblib.load(cluster_path) if os.path.exists(cluster_path) else None
+        return model, cluster_artifact
+    except Exception as e:
+        st.error(f"Error cargando modelos: {e}")
+        return None, None
+
+def get_latest_processed_file():
+    """Busca el archivo procesado más reciente en data/processed/."""
+    try:
+        files = glob.glob("data/processed/user_features_churn_*.csv")
+        if not files:
+            # Fallback a archivo base si existe
+            if os.path.exists("data/processed/user_features_churn.csv"):
+                return "data/processed/user_features_churn.csv"
+            return None
+        # Ordenar por fecha (asumiendo formato YYYYMMDD) al final del nombre
+        files.sort(reverse=True)
+        return files[0]
+    except Exception as e:
+        return None
 
 def apply_inference(df_input, churn_model, cluster_artifact):
     """Ejecuta la cadena de inferencia. Asume que el CSV ya tiene Internal_ID (seudonimizado)."""
@@ -170,32 +198,65 @@ def main():
         st.error("No se encontró el modelo de Churn. Ejecute el pipeline de entrenamiento.")
         return
 
+    # Definir el nombre del algoritmo globalmente para la UI
+    model_algo_name = type(churn_model.named_steps['clf']).__name__ if churn_model else "Desconocido"
+
+    # --- NAVEGACIÓN DE ALTO NIVEL ---
+    st.sidebar.markdown("### 🏛️ Área de Trabajo")
+    app_mode = st.sidebar.radio(
+        "Seleccione Interfaz",
+        ["Tienda (Business Face)", "Ingesta y Gobernanza (Data Hub)", "Dashboard (Intelligence)"],
+        index=0,
+        help="Navegue entre la experiencia de cliente, el control de datos o la analítica de riesgo."
+    )
+    st.sidebar.divider()
+
+    if app_mode == "Tienda (Business Face)":
+        render_ecommerce()
+        return 
+    
+    if app_mode == "Ingesta y Gobernanza (Data Hub)":
+        render_ingestion_hub()
+        return
+
     # Sidebar
     st.sidebar.title("Configuración")
     st.sidebar.success("🔒 Protección PII Activa: Arquitectura Zero Trust (ETL).")
-    st.sidebar.caption("📦 **Predictor Churn:** XGBoost v1.0 (Estable)")
+    st.sidebar.caption(f"📦 **Predictor Churn:** {model_algo_name} (Optimizado: Recall)")
     st.sidebar.caption("🧩 **Motor Segmentación:** K-Prototypes v1.0")
-    st.sidebar.caption("📅 **Entrenamiento Estático:** Nov 2023")
+    st.sidebar.caption("📅 **Entrenamiento Estático:** Abril 2026")
+    
+    if st.sidebar.button("🔄 Refrescar Modelos"):
+        st.cache_resource.clear()
+        st.rerun()
     
     df_raw = None
     file_identifier = None
     
     if "demo_active" not in st.session_state:
         st.session_state.demo_active = False
+    if "demo_file_path" not in st.session_state:
+        st.session_state.demo_file_path = None
     
     st.sidebar.markdown("### 🎮 Modo Demo")
-    if st.sidebar.button("⚡ Cargar Datos de Demo", help="Ejecuta el dashboard con el dataset pre-sanitizado."):
-        st.session_state.demo_active = True
-        
-    if st.session_state.demo_active:
-        demo_path = "data/processed/user_features_churn.csv"
-        if os.path.exists(demo_path):
-            df_raw = pd.read_csv(demo_path)
-            file_identifier = "demo_file"
-            st.session_state.pii_cleared = file_identifier
+    if st.sidebar.button("⚡ Cargar Datos de Demo"):
+        latest_file = get_latest_processed_file()
+        if latest_file:
+            st.session_state.demo_active = True
+            st.session_state.demo_file_path = latest_file
+            st.sidebar.success(f"Archivo detectado: {os.path.basename(latest_file)}")
         else:
-            st.sidebar.error("Error: Dataset de Demo no disponible. Ejecute el ETL primero.")
+            st.sidebar.error("Error: Dataset de Demo no disponible en 'data/processed/'.")
+        
+    if st.session_state.demo_active and st.session_state.demo_file_path:
+        if os.path.exists(st.session_state.demo_file_path):
+            df_raw = pd.read_csv(st.session_state.demo_file_path)
+            file_identifier = os.path.basename(st.session_state.demo_file_path)
+            st.session_state.pii_cleared = file_identifier
+            st.sidebar.info(f"Usando: {file_identifier}")
+        else:
             st.session_state.demo_active = False
+            st.sidebar.warning("El archivo de demo ya no existe.")
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("### 🗃️ Carga Manual")
@@ -303,7 +364,6 @@ def main():
             
             c1, c2 = st.columns([2, 1])
             with c1:
-                model_algo_name = type(churn_model.named_steps['clf']).__name__ if churn_model else "Desconocido"
                 fig_dist = px.histogram(df_final, x="Churn_Probability", color="Risk_Segment", 
                                        title=f"Distribución de Probabilidades (Modelo: {model_algo_name})",
                                        color_discrete_map={'Bajo': '#22C55E', 'Medio': '#F59E0B', 'Alto': '#EF4444'})

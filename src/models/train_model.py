@@ -134,16 +134,16 @@ def generate_benchmark_report(results):
     report += "| Modelo | Accuracy | Precision | Recall | F1-Score | AUC | Brier |\n"
     report += "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n"
 
-    best_auc = 0
+    best_metric = 0
     winner = ""
     for name, m in results.items():
         report += (f"| {name} | {m['accuracy']:.4f} | {m['precision']:.4f} | "
                    f"{m['recall']:.4f} | {m['f1']:.4f} | {m['auc']:.4f} | {m['brier']:.4f} |\n")
-        if m['auc'] > best_auc:
-            best_auc = m['auc']
+        if m['recall'] > best_metric:
+            best_metric = m['recall']
             winner = name
 
-    report += f"\n🏆 **Modelo Ganador**: {winner} (AUC = {best_auc:.4f})\n\n"
+    report += f"\n🏆 **Modelo Ganador**: {winner} (Optimizado por **Recall** = {best_metric:.4f})\n\n"
     report += "## Curvas ROC Comparativas\n\n"
     report += "![Curvas ROC](figures/roc_comparison.png)\n\n"
     report += "## Matrices de Confusión\n\n"
@@ -210,9 +210,9 @@ def train_pipeline(data_path, model_output_path):
     generate_confusion_matrices(comparison, y_test)
     generate_benchmark_report(comparison)
 
-    # 5. Guardar el modelo ganador
-    winner_name = max(comparison, key=lambda k: comparison[k]['auc'])
-    print(f"\n🏆 El ganador es: {winner_name} (AUC={comparison[winner_name]['auc']:.4f})")
+    # 5. Guardar el modelo ganador (Priorizando RECALL por necesidad de Negocio)
+    winner_name = max(comparison, key=lambda k: comparison[k]['recall'])
+    print(f"\n🏆 El ganador para Negocio es: {winner_name} (Recall={comparison[winner_name]['recall']:.4f})")
 
     for name, metrics in comparison.items():
         print(f"\n--- {name} ---")

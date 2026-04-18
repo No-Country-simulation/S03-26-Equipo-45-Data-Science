@@ -8,7 +8,7 @@
 | RandomForest | 0.6411 | 0.9326 | 0.6456 | 0.7630 | 0.6730 | 0.2158 |
 | XGBoost | 0.6817 | 0.9303 | 0.6965 | 0.7966 | 0.6655 | 0.2063 |
 
-🏆 **Modelo Ganador**: RandomForest (AUC = 0.6730)
+🏆 **Modelo Ganador**: XGBoost (Optimizado por **Recall** = 0.6965)
 
 ## Curvas ROC Comparativas
 

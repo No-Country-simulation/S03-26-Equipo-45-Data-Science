@@ -1,3 +1,8 @@
+"""
+Motor Prescriptivo de Retención.
+Cruza la probabilidad de Churn (Riesgo) con el Arquetipo Conductual (Cluster) 
+para derivar acciones personalizadas con prioridad y descripción.
+"""
 import pandas as pd
 from src.utils.logger import logDebug, logSequence
 

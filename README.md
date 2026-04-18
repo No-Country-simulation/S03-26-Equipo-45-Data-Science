@@ -86,44 +86,39 @@ El tercer pilar estructural de la plataforma transforma los cálculos probabilí
 
 El flujo de información desde la ingesta de transacciones puras hasta el servicio web predictivo sigue una estricta doctrina de seguridad:
 
-### ⚙️ Arquitectura de la Solución
+### ⚙️ Arquitectura de la Solución (Refinería de Inteligencia)
+La plataforma opera bajo un modelo de "Doble Puerta": una para la interacción de negocio (**E-commerce**) y otra para la gobernanza industrial (**Data Hub**).
+
 ```mermaid
 graph TD
-    subgraph Data Source [Capa de Origen - BigQuery vía Kaggle]
-        KGL[KaggleHub API]
-        R[(7 Tablas Relacionales \n 500+ MB)]
+    subgraph Ingestion [Capa de Entrada & Negocio]
+        Store[Shamy Store \n Generador de Eventos]
+        Hub[Ingestion Data Hub \n Mando de Gobernanza]
     end
 
-    subgraph ETL [Pipeline de Ingesta & Limpieza - Backend]
-        Merge[make_dataset.py \n RFM & Event Aggregation]
-        PII[MS Presidio Engine \n Análisis NLP de Privacidad]
-        DB_Wh[user_features_churn.csv]
+    subgraph ETL [Refinería de Datos - Backend]
+        Raw[18 Campos Base \n Matriz de Materia Prima]
+        PII[MS Presidio Audit \n Zero-Trust Privacy]
+        Ref[make_dataset.py \n Refinamiento 18 -> 21]
     end
 
-    subgraph ML [Motor Predictivo - Scikit-Learn]
-        XGB[XGBoost Pipeline]
-        KPT[K-Prototypes Segments]
-        Actions[Motor Prescriptivo]
+    subgraph ML [Cerebro IA - Inferencia]
+        XGB[XGBoost Champion \n Matrix de 21 Variables]
+        Actions[Motor Prescriptivo \n Estrategias de Retención]
     end
 
-    subgraph Frontend [Centro de Mando - Streamlit]
-        Guard[Fail-Fast Guard & Hash ID]
-        UX[UI Glassmorphism \n Vistas Flash & Tabs]
-    end
-
-    KGL -->|Descarga Segura| R
-    R -->|Pandas/Polars| Merge
-    Merge -->|Auditaje Prevención Leakage| PII
-    PII -->|Censura PII & Seudonimización| DB_Wh
-
-    DB_Wh -.->|Features| XGB
-    DB_Wh -.->|Num+Cat| KPT
-    
+    Store -->|Events| Hub
+    Hub --> Raw
+    Raw --> PII
+    PII --> Ref
+    Ref -->|Matrix Auditada| XGB
     XGB --> Actions
-    KPT --> Actions
     
-    DB_Wh -->|Subida Web| Guard
-    Guard --> UX
+    subgraph Front [Visualización Ejecutiva]
+        Dash[Dashboard de Churn \n ROI & Atlas de Reglas]
+    end
+    
+    Actions --> Dash
 ```
 
 ---
@@ -154,7 +149,9 @@ proyecto-ecommerce-churn/
 │   │   └── train_model.py       # Tuning Scikit-Learn y Exportación Joblib
 │   │
 │   └── app/                    
-│       └── main.py              # Front-Door (UI Streamlit)
+│       ├── main.py              # Front-Door (Orquestador Streamlit)
+│       ├── ecommerce.py         # Business Face (Tienda Shamy)
+│       └── ingestion_hub.py     # Data Hub (Gobernanza & Refinamiento)
 │
 ├── models/                     # Modelos serializados .joblib
 ├── reports/                    # 📊 Informes offline para consumo ejecutivo
@@ -170,34 +167,33 @@ proyecto-ecommerce-churn/
 
 Para reproducir el entorno desde cero y asegurar que el modelo se alimente con los datos más frescos, el sistema debe ejecutarse en el siguiente orden estricto (Pipeline ETL y Entrenamiento):
 
-### 1. Ingesta y Limpieza de Datos (Data Engineering)
-Extrae los datos desde Kaggle Hub, los anonimiza utilizando Microsoft Presidio y consolida los features por usuario.
+### 1. Preparación de Entorno & Datos Crudos
+Configure las claves necesarias y obtenga el origen de datos.
 ```bash
-# 1. (Opcional si no tienes la data cruda) Descargar datasets de TheLook
-python src/data/download_datasets.py
+# 1. Configurar variables de entorno (.env)
+cp .env.example .env 
+# IMPORTANTE: Definir USER_SALT y GEMINI_API_KEY en el archivo .env
 
-# 2. Compilar features, anonimizar PII y crear la base maestra para entrenamiento
+# 2. (Opcional) Descargar datasets de TheLook
+python src/data/download_datasets.py
+```
+
+### 2. Refinamiento Industrial (ETL & IA)
+Transforma la materia prima (18 campos) en inteligencia (21 variables) con auditoría proactiva.
+```bash
 python src/data/make_dataset.py
 ```
-> **Salida Esperada:** `data/processed/user_features_churn.csv`
+> **Salida:** `data/processed/user_features_churn_YYYYMMDD.csv`
 
-### 2. Entrenamiento de Modelos (Data Science)
-Entrena la arquitectura predictiva y el motor de segmentación geométrica.
-```bash
-# 1. Entrenar XGBoost, evaluar métricas, generar matrices ROC y exportar .joblib
-python src/models/train_model.py
-
-# 2. Optimizar K-Prototypes, definir Arquetipos Conductuales y exportar .joblib
-python src/models/train_clustering.py
-```
-> **Salida Esperada:** Modelos `.joblib` en la carpeta `/models/` y diagnósticos en `/reports/`.
-
-### 3. Despliegue del Centro de Mando (Dashboard)
-Levanta la interfaz operativa para analizar cohortes en tiempo real.
+### 3. Operación y Análisis (Centro de Mando)
+Lanza el ecosistema interactivo para clientes y gerentes.
 ```bash
 streamlit run src/app/main.py
 ```
-> **Nota:** Para que la inferencia contextual LLM funcione (Traducción SHAP), asegúrate de tener tu archivo `.env` configurado con tu variable `GEMINI_API_KEY`.
+
+---
+> [!IMPORTANT]
+> **Configuración de IA Generativa**: Para que el Dashboard pueda interpretar los resultados técnicos (SHAP) en lenguaje de negocio prosa, es **indispensable** contar con una `GEMINI_API_KEY` válida en su archivo `.env`. Sin esto, el módulo de explicabilidad LLM fallará.
 
 ---
 ## 🛡️ Privacidad Zero Trust (Shift-Left)
@@ -230,17 +226,14 @@ La seguridad es lo primero. Crea la variable `USER_SALT` para la seudonimizació
 cp .env.example .env
 ```
 
-### 4. Flujo Obligatorio (De 0 a 100)
-1. **Descargar Origen**: `python src/data/download_datasets.py`
-2. **Despliegue del Almacén Auditado**: Ejecuta el ETL pesado con IA proactiva (Shift-Left Privacidad).
+### 4. Flujo Oficial de Operación (De 0 a 100)
+1. **Generar Eventos (Opcional)**: Ejecuta `streamlit run src/app/main.py`, selecciona **"Tienda (Business Face)"** y realiza compras/clics simulados.
+2. **Refinar Datos**: Ejecuta el pipeline industrial para procesar los últimos movimientos.
    ```bash
    python src/data/make_dataset.py
    ```
-3. **Entrenamiento (Opcional)**: `python src/models/train_model.py`
-4. **Abrir el Dashboard**:
-   ```bash
-   streamlit run src/app/main.py
-   ```
+3. **Auditar Calidad**: Regresa al Dashboard, selecciona **"Ingesta y Gobernanza (Data Hub)"** y verifica que el mapeo 18 -> 21 sea consistente.
+4. **Predecir Churn**: Ve a la pestaña **"Dashboard (Intelligence)"** y carga el archivo versionado más reciente.
 
 ---
 
@@ -248,8 +241,9 @@ cp .env.example .env
 
 Para asegurar la integridad técnica y comercial del proyecto, hemos establecido una arquitectura de gobernanza basada en transparencia y prevención de riesgos:
 
-- [**🛡️ Prevención de Data Leakage**](docs/9_preparacion_datos_leakage.md): Detalle técnico de cómo usamos la técnica *Shift-Left* y el *Cutoff Date* para evitar falsas precisiones.
-- [**🧠 Estrategia de Entrenamiento (CAC & CLV)**](docs/10_entrenamiento_y_frecuencia.md): Justificación de KPIs de negocio para la sensibilidad del modelo y protocolo de re-entrenamiento bimestral.
+- [PRE09 - Preparación de Datos y Anti-Leakage](docs/9_preparacion_datos_leakage.md): Estrategia de ventanas temporales.
+- [PRE10 - Entrenamiento y Frecuencia de Reentrenamiento](docs/10_entrenamiento_y_frecuencia.md): Justificación técnica y KPIs (CAC/CLV).
+- [PRE11 - Evolución Experimental a Industrial](docs/11_evolucion_experimental_a_industrial.md): Crónica y justificación de arquitectura.
 - [**🔒 Auditoría de Privacidad**](docs/7_xai_llm_hybrid_pipeline.md): Uso de Microsoft Presidio para garantizar un sistema *Zero-Trust*.
 
 > [!NOTE]

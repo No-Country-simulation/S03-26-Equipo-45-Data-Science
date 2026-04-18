@@ -1,3 +1,8 @@
+"""
+Engine de Transformación de Características para Churn.
+Este módulo se encarga de la limpieza final y creación de variables derivadas para el modelo.
+Nota: La privacidad/seudonimización se maneja en el nivel de ETL (make_dataset.py).
+"""
 import pandas as pd
 
 def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:

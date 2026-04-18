@@ -3,6 +3,11 @@ Construye el análisis de Funnel de Conversión desde events.csv.
 Genera métricas agregadas globales para Business Intelligence.
 NO alimenta al modelo predictivo (separación de responsabilidades).
 """
+"""
+Motor de Análisis de Funnel de Conversión.
+Extrae y calcula tasas de conversión y abandono (drop-off) 
+basadas en sesiones de comportamiento web.
+"""
 import pandas as pd
 import os
 import sys

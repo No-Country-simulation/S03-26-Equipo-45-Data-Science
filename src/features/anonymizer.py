@@ -1,3 +1,8 @@
+"""
+Modulo de Privacidad Industrial - Microsoft Presidio.
+Implementa el escaneo y anonimización de PII (Personally Identifiable Information) 
+en DataFrames de forma proactiva y batch.
+"""
 import pandas as pd
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
