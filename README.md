@@ -58,20 +58,18 @@ Para una comprensión profunda de las decisiones arquitectónicas, validaciones 
 | <img src="reports/figures/funnel_conversion.png" width="400" alt="Cruce de Segmentos"> | <img src="reports/figures/shap_summary.png" width="400" alt="Análisis SHAP"> |
 
 ---
-
 ## 👥 Roles del Proyecto
-El desarrollo se estructuró dividiendo responsabilidades bajo el estándar de Topología de Agentes:
+El desarrollo se estructuró dividiendo responsabilidades de la siguiente manera:
 - **ML Engineer (Core & Backend)**: Garantiza la integridad temporal evitando el ruido (Data Leakage) con técnicas *cut-off date*. Diseñó el pipeline Scikit-Learn end-to-end integrando interpolaciones de hiperparámetros (Random Forest, XGBoost) y *K-Prototypes* para tratar atributos híbridos.
 - **Implementador (Arquitectura & UI)**: Asegura que el código sea declarativo y optimizado. Rediseño agresivamente la interfaz implementando *Glassmorphism* CSS en Streamlit y construyó toda la estructura de interacciones dinámicas.
 
----
+### 🛠️ Equipo de Desarrollo
 
-## 🎥 Funciones y Aplicaciones
-- **Predicción Categórica**: Intersección entre riesgo estadístico (Alto/Medio/Bajo) medido por XGBoost y valor financiero individual del usuario.
-- **Gestión CRM Dinámica (Motor Prescriptivo)**: Matriz que cruza el Nivel de Riesgo y el Arquetipo Conductual (`K-Clusters`) para sugerir canales de retención tangibles y exportables en un JSON directo para Hubspot o Mail Marketing.
-- **Extracción Analítica de SCM**: Mapeos estadísticos sobre devoluciones logísticas que demostraron cómo el producto físico y la experiencia física penalizan el Customer Lifetime Value.
-- **Explicabilidad (XAI)**: Mapeo de contribuciones con `SHAP TreeExplainer` para asegurar un modelo *honesto* ("caja de cristal").
-
+| Integrante | Rol | LinkedIn |
+| :--- | :--- | :--- |
+| **Oscar Paye** | Data Scientist | [LinkedIn](https://www.linkedin.com/in/oscar-paye01/) |
+| **Jose Cardozo** | Data Analyst | [LinkedIn](https://www.linkedin.com/in/jose-cardozo-vera/) |
+| **Mary Gonzalez** | Data Analyst | [LinkedIn](https://www.linkedin.com/in/mary-gonzalez-465a30188/) |
 ---
 
 ### 🎯 Motor Prescriptivo Dinámico y Atlas de Reglas (CRM)
